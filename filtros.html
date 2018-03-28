@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Filtros em Vue.js</title>
+	<script src="https://unpkg.com/vue/dist/vue.js"></script>
+	<style type="text/css">
+		label {
+		    text-transform: capitalize;
+		}
+
+		* {
+			font-family: "Arial";
+		}
+
+		.filters {
+			width: 25%;
+			display: inline-block;
+		}
+
+		#app {
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		ul {
+			padding: 0;
+			list-style: none;
+			column-count: 2;
+		}
+
+		.product-wrap {
+			width: 75%;
+			display: inline-block;
+		}
+
+		.product {
+	    width: 25%;
+	    display: inline-block;
+	    text-align: center;
+		}
+
+	</style>
+</head>
+<body>	
+
+	<div id="app">
+		<div class="filters">
+			<form>
+				<div class="cores">
+					<h3>Cores</h3>
+					<ul>
+						<li>
+							<input type="checkbox" name="cor" value="vermelho" id="vermelho" v-on:change="filter">
+							<label for="vermelho">vermelho</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="azul" id="azul" v-on:change="filter">
+							<label for="azul">azul</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="verde" id="verde" v-on:change="filter">
+							<label for="verde">verde</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="violeta" id="violeta" v-on:change="filter">
+							<label for="violeta">violeta</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="amarelo" id="amarelo" v-on:change="filter">
+							<label for="amarelo">amarelo</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="laranja" id="laranja" v-on:change="filter">
+							<label for="laranja">laranja</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="marrom" id="marrom" v-on:change="filter">
+							<label for="marrom">marrom</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="branco" id="branco" v-on:change="filter">
+							<label for="branco">branco</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="preto" id="preto" v-on:change="filter">
+							<label for="preto">preto</label>
+						</li>
+						<li>
+							<input type="checkbox" name="cor" value="cinza" id="cinza" v-on:change="filter">
+							<label for="cinza">cinza</label>
+						</li>
+					</ul>
+				</div>
+
+
+				<div class="tamanhos">
+					<h3>Tamanhos</h3>
+
+					<ul>
+						<li>
+							<input type="checkbox" name="tamanho" value="PP" id="PP" v-on:change="filter">
+							<label for="PP">PP</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="P" id="P" v-on:change="filter">
+							<label for="P">P</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="M" id="M" v-on:change="filter">
+							<label for="M">M</label>
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="G" id="G" v-on:change="filter">
+							<label for="G">G</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="GGG" id="GGG" v-on:change="filter">
+							<label for="GGG">GGG</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="36" id="36" v-on:change="filter">
+							<label for="36">36</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="37" id="37" v-on:change="filter">
+							<label for="37">37</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="38" id="38" v-on:change="filter">
+							<label for="38">38</label>
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="39" id="39" v-on:change="filter">
+							<label for="39">39</label>
+						</li>
+						<li>
+							<input type="checkbox" name="tamanho" value="Un" id="Un" v-on:change="filter">
+							<label for="Un">Un</label>
+						</li>
+					</ul>
+				</div>
+
+				<div class="voltagens">
+					<h3>Voltagens</h3>
+
+					<ul>
+						<li>
+							<input type="checkbox" name="voltagem" value="110" id="110" v-on:change="filter">
+							<label for="110">110</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="voltagem" value="220" id="220" v-on:change="filter">
+							<label for="220">220</label>	
+						</li>
+						<li>
+							<input type="checkbox" name="voltagem" value="bivolt" id="bivolt" v-on:change="filter">
+							<label for="bivolt">bivolt</label>	
+						</li>
+					</ul>
+	
+				</div>
+				<a v-on:click="clear">Limpar</a>
+			</form>
+		</div>
+
+		<div class="product-wrap">
+			<div class="product" v-for="product in filteredList">
+				<figure>
+					<img v-bind:src="product.imagem">
+				</figure>
+				<h2>{{ product.nome }}</h2>
+				<h3>R$ {{ product.preco.toFixed(2) }}</h3>
+				<h4>{{ product.cor }}</h4>
+				<h4>{{ product.tamanho }}</h4>
+				<h4>{{ product.voltagem }}</h4>
+			</div>
+		</div>
+
+		
+	</div>
+
+	<script type="text/javascript">
+	'use strict';
+
+		let app = new Vue({
+			el: "#app",
+			data: {
+				filterParams: [],
+				filteredList: [],
+				originalList: [],
+				queryName: "",
+				minProductPrice: 0,
+				maxProductPrice: 0
+			},
+			methods: {
+			  geraJSON: function(total) {
+
+					const cores = ['vermelho', 'azul', 'verde', 'violeta', 'amarelo', 'laranja', 'marrom', 'branco', 'preto', 'cinza'];
+					const tamanhos = ['PP', 'P', 'M', 'G', 'GGG', '36', '37', '38', 'Un', '39'];
+					const voltagens = ['110', '220', 'bivolt'];
+					let JSON = [];
+
+					for (let i = 0 - 1; i < total; i++) {
+
+						var numeroCores = Math.floor((Math.random() * 2) + 1);
+						var numeroTamanhos = Math.floor((Math.random() * 3) + 1);
+						var numeroVoltagens = Math.floor((Math.random() * 2) + 1);
+						var coresFinal = [];
+						var tamanhosFinal = [];
+						var voltagensFinal = [];
+
+						var preco = Math.floor((Math.random() * 1000) + 1);
+
+						for (var j = 0; j < numeroCores; j++) {
+							var index = Math.floor((Math.random() * 10) + 1) - 1;
+
+							if (coresFinal.indexOf(cores[index]) === -1 ) {
+								coresFinal.push(cores[index]);
+							}
+						}
+
+						for (var j = 0; j < numeroTamanhos; j++) {
+							var index = Math.floor((Math.random() * 10) + 1) - 1;
+
+							if (tamanhosFinal.indexOf(tamanhos[index]) === -1 ) {
+								tamanhosFinal.push(tamanhos[index]);
+							} 
+						}
+
+						for (var j = 0; j < numeroVoltagens; j++) {
+							var index = Math.floor((Math.random() * 3) + 1) - 1;
+
+							if (voltagensFinal.indexOf(voltagens[index]) === -1 ) {
+								voltagensFinal.push(voltagens[index]);
+							}
+						}
+
+						let newProduct = {
+							"nome": `Produto_${i+1}`,
+							"cor": coresFinal,
+							"tamanho": tamanhosFinal,
+							"voltagem": voltagensFinal,
+							"preco": preco,
+							"imagem": "http://placehold.it/200x200"
+						}
+
+						JSON.push(newProduct);
+					}
+					return JSON;
+				},
+				filter: function(e) {
+
+					let type = e.target.name;
+					let value = e.target.value;
+					let $this = this;
+					let _this = this.$data;
+
+					$this.mountParams(e.target.name, e.target.value, e.target.checked);
+
+					_this.filteredList = _this.originalList;
+					_this.filteredList = _this.filteredList.filter(function (el) {
+						let validou = true;
+						for (let j = 0; j < _this.filterParams.length; j++) {
+							let key = Object.keys(_this.filterParams[j]);
+							let valArr = _this.filterParams[j][key];
+							
+							if (el[key]) {
+								if (!$this.findOne(el[key], valArr)) {
+									validou = false;
+								}
+							}
+						}
+						return validou;
+					});
+				},
+				mountParams: function(type, value, isChecked) {
+					if (isChecked) {
+						var existe = false;
+						
+						for (let i = 0; i < this.$data.filterParams.length; i++) {
+							if (this.$data.filterParams[i][type]) {
+								this.$data.filterParams[i][type].push(value);
+								existe = true;
+								break;
+							}		
+						}
+						if (existe) {
+						} else {
+							this.$data.filterParams.push({[type] : [value]});
+						}
+					} else {
+						for (let i = 0; i < this.$data.filterParams.length; i++) {
+							
+							if (this.$data.filterParams[i][type]) {
+								this.$data.filterParams[i][type].splice(this.$data.filterParams[i][type].indexOf(value), 1);
+								this.$data.filterParams[i][type].length === 0 ? this.$data.filterParams.splice(this.$data.filterParams.indexOf(this.$data.filterParams[i]), 1) : undefined;
+								break;
+							}		
+						}
+					}
+				},
+				clear: function() {
+					this.$data.filteredList = this.$data.originalList;
+				},
+				findOne: function(searchArr, testArr) {
+			    return testArr.some(function (v) {
+			        return searchArr.indexOf(v) >= 0;
+			    });
+				},
+				setPrices: function(list) {
+					let _this = this.$data;
+					list.forEach(function(el, index) {
+						if (index === 0) {
+							 _this.minProductPrice = el.preco;
+							 _this.maxProductPrice = el.preco;
+						}
+						el.preco < _this.minProductPrice ? _this.minProductPrice = el.preco : undefined;
+						el.preco > _this.maxProductPrice ? _this.maxProductPrice = el.preco : undefined;
+					});
+				}
+			},
+			watch: {
+				filteredList: function() {
+					this.$data.filterParams.length === 0 ? this.$data.filteredList = this.$data.originalList : undefined;
+				}
+			},
+			created: function() {
+				this.$data.originalList = this.geraJSON(50);
+				this.setPrices(this.$data.originalList);
+				this.$data.filteredList = this.originalList;
+			}
+		})
+	</script>
+
+</body>
+</html>
